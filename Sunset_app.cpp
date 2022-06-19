@@ -17,7 +17,14 @@
 #include "./textures/textures.h"
 #include "./textures/textures.cpp"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
+
+
+const unsigned int _width_ = 800;
+const unsigned int _height_ = 800;
 
 void _gl_init()
 {
@@ -65,21 +72,26 @@ int main()
     //
     GLfloat _gl_vertices_data[] = 
     {
-        -0.5f, -0.5f, 0.0f,         1.0f, 0.0f, 0.0f,   0.0f, 0.0f,
-        -0.5f,  0.5f, 0.0f,         0.0f, 1.0f, 0.0f,   0.0f, 1.0f,
-         0.5f,  0.5f, 0.0f,         0.0f, 0.0f, 1.0f,   1.0f, 1.0f,
-         0.5f, -0.5f, 0.0f,         1.0f, 1.0f, 1.0f,   1.0f, 0.0f
+	    -0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+	    -0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
+	     0.5f, 0.0f, -0.5f,     0.83f, 0.70f, 0.44f,	0.0f, 0.0f,
+	     0.5f, 0.0f,  0.5f,     0.83f, 0.70f, 0.44f,	1.0f, 0.0f,
+	     0.0f, 0.8f,  0.0f,     0.92f, 0.86f, 0.76f,	1.5f, 1.0f
     };
 
     GLuint _gl_indices_data[] =
     {
-        0, 2, 1,
-        0, 3, 2
+        0, 1, 2,
+	    0, 2, 3,
+	    0, 1, 4,
+	    1, 2, 4,
+	    2, 3, 4,
+	    3, 0, 4
     };
 
     // Variable that goes store the window object. This is literally the window.
     //
-    auto h_Window = glfwCreateWindow(800, 800, "", NULL, NULL);
+    auto h_Window = glfwCreateWindow(_width_, _height_, "", NULL, NULL);
 
 
     // Function will show the current window below.
@@ -89,7 +101,7 @@ int main()
 
     // Function that goes setup the graphics extension library.
     //
-    _gl_glad_setup(800, 800);
+    _gl_glad_setup(_width_, _height_);
 
 
     // Generate the shaders and process.
@@ -125,14 +137,30 @@ int main()
 
     // Create and load some textures. Tells the unit processment local.
     //
-    Sunset_textures _texture_load("./textures/media/Noise.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    Sunset_textures _texture_load("./textures/media/brick.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     _texture_load._texture_unit(_shaders, "tex0", 0);
+
+
+    // Some variables to help the rotation of the pyramid.
+    //
+    float rotation = 0.0f;
+    double _prev_time = glfwGetTime();
+
+
+    // Enable depth buffers.
+    //
+    glEnable(GL_DEPTH_TEST);
 
 
     // Window main loop. That will makes him stay open while the user are using.
     //
     while(!glfwWindowShouldClose(h_Window))
     {
+        
+        // Clears the colors and depths at the scene.
+        //
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
         // Use programs and buffers to draw something on the screen.
         //
@@ -140,7 +168,45 @@ int main()
         _texture_load._texture_bind();
         _vao.bind_vao();
 
-        
+
+        // Just a simple timer.
+        //
+        double _crnt_time = glfwGetTime();
+        if(_crnt_time - _prev_time >= 1 / 60)
+        {
+            rotation += 0.2f;
+            _prev_time = _crnt_time;
+        }
+
+
+        // Initializes some matrices to config the objects at the scene.
+        //
+        glm::mat4 _model_matrix = glm::mat4(1.0f);
+        glm::mat4 _view_matrix = glm::mat4(1.0f);
+        glm::mat4 _projection_matrix = glm::mat4(1.0f);
+
+
+        // Set some transformations to they matrices.
+        //
+        _model_matrix = glm::rotate(_model_matrix, glm::radians(rotation), glm::vec3(0.05f, 0.5f, 0.0f));
+        _view_matrix = glm::translate(_view_matrix, glm::vec3(0.0f, -2.5f, -2.0f));
+        _projection_matrix = glm::perspective(glm::radians(45.0f), (float)(_width_/_height_), 0.1f, 100.0f);
+
+
+        // Outputs the matrices to vertex shaders input.
+        //
+        int _model_loc = glGetUniformLocation(_shaders._shader_program_id, "model");
+        glUniformMatrix4fv(_model_loc, 1, GL_FALSE, glm::value_ptr(_model_matrix));
+
+        int _view_loc = glGetUniformLocation(_shaders._shader_program_id, "view");
+        glUniformMatrix4fv(_view_loc, 1, GL_FALSE, glm::value_ptr(_model_matrix));
+
+        int _projection_loc = glGetUniformLocation(_shaders._shader_program_id, "proj");
+        glUniformMatrix4fv(_projection_loc, 1, GL_FALSE, glm::value_ptr(_model_matrix));
+
+
+        // Draw elements to the screen.
+        //
         glDrawElements(GL_TRIANGLES, sizeof(_gl_indices_data)/sizeof(GLuint), GL_UNSIGNED_INT, 0);
         
 

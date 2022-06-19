@@ -25,7 +25,7 @@ public:
 
     // Some void functions.
     //
-    void link_attrib(Sunset_vbo _vbo_input, GLuint _layout_input, GLuint _components, GLenum _type, GLsizeiptr _stride, void* _offset);
+    void link_attrib(Sunset_vbo&  _vbo_input, GLuint _layout_input, GLuint _components, GLenum _type, GLsizeiptr _stride, void* _offset);
 
     void bind_vao();
     void unbind_vao();

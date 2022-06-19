@@ -55,7 +55,7 @@ Sunset_textures::Sunset_textures(const char* _image_dir, GLenum _texture_type, G
 }
 
 
-void Sunset_textures::_texture_unit(Sunset_shaders _shader_object, const char* _uniform, GLuint _unit)
+void Sunset_textures::_texture_unit(Sunset_shaders& _shader_object, const char* _uniform, GLuint _unit)
 {
 
     // Get the uniform location in vertices shader.

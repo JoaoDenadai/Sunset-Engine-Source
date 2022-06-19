@@ -30,7 +30,7 @@ public:
 
     // Some void functions.
     //
-    void _texture_unit(Sunset_shaders _shader_object, const char* _uniform, GLuint _unit);
+    void _texture_unit(Sunset_shaders&  _shader_object, const char* _uniform, GLuint _unit);
     void _texture_bind();
     void _texture_unbind();
     void _texture_delete();

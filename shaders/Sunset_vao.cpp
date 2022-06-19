@@ -12,7 +12,7 @@ Sunset_vao::Sunset_vao()
 }
 
 
-void Sunset_vao::link_attrib(Sunset_vbo _vbo_input, GLuint _layout_input, GLuint _components, GLenum _type, GLsizeiptr _stride, void* _offset)
+void Sunset_vao::link_attrib(Sunset_vbo&  _vbo_input, GLuint _layout_input, GLuint _components, GLenum _type, GLsizeiptr _stride, void* _offset)
 {
 
     // Binds the another buffer to this one.
