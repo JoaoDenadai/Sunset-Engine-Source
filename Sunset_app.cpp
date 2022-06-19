@@ -81,7 +81,7 @@ int main()
 
     GLuint _gl_indices_data[] =
     {
-        0, 1, 2,
+            0, 1, 2,
 	    0, 2, 3,
 	    0, 1, 4,
 	    1, 2, 4,
